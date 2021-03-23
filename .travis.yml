@@ -1,32 +1,32 @@
 language: cpp
-env: 
+env:
   global:
     - SOURCE_JDK_BRANCH=dcevm8u282b08
     - SOURCE_JDK_TAG=dcevm8u282b08
 jdk: oraclejdk8
 matrix:
   include:
-  - os: osx
-    env: OS_BUILD=osx
-    osx_image: xcode9.4
-#    before_install:
-#    - brew update
-#    - brew install gcc
-  - os: linux
-    env: OS_BUILD=linux
-    dist: xenial
-    sudo: required
-    before_install:
-    - sudo apt-get install -y libx11-dev libxext-dev libxrender-dev libxtst-dev libxt-dev
-      libcups2-dev libasound2
-    - sudo ln -s /usr/lib/x86_64-linux-gnu/libasound.so.2 /usr/lib/x86_64-linux-gnu/libasound.so
-  - os: windows
-    env: OS_BUILD=windows
-    before_install:
-#    - choco install microsoft-build-tools --version 12.0.21005.20140416 --force
-    - choco install cygwin
-    - choco install vs2010sdk
-    - C:\\tools\\cygwin\\cygwinsetup.exe -q -P make,unzip,automake,autoconf,zip
+    - os: osx
+      env: OS_BUILD=osx
+      osx_image: xcode9.4
+    #    before_install:
+    #    - brew update
+    #    - brew install gcc
+    - os: linux
+      env: OS_BUILD=linux
+      dist: xenial
+      sudo: required
+      before_install:
+        - sudo apt-get install -y libx11-dev libxext-dev libxrender-dev libxtst-dev libxt-dev
+          libcups2-dev libasound2
+        - sudo ln -s /usr/lib/x86_64-linux-gnu/libasound.so.2 /usr/lib/x86_64-linux-gnu/libasound.so
+    - os: windows
+      env: OS_BUILD=windows
+      before_install:
+        #    - choco install microsoft-build-tools --version 12.0.21005.20140416 --force
+        - choco install cygwin
+        - choco install vs2010sdk
+        - C:\\tools\\cygwin\\cygwinsetup.exe -q -P make,unzip,automake,autoconf,zip
 before_script:
   - if [[ $OS_BUILD == "windows" ]]; then git config --system core.longpaths true; git config --global core.autocrlf false; fi
   - unset -v _JAVA_OPTIONS;
@@ -35,29 +35,29 @@ script:
   - export JDK8_BOOT_DIR="$PWD/openjdk-build/jdk-8"
   - export HSWAP_AGENT_DOWNLOAD_URL=https://github.com/HotswapProjects/HotswapAgent/releases/download/RELEASE-1.4.1/hotswap-agent-1.4.1.jar
   - mkdir -p "$JDK8_BOOT_DIR"
-  - if [[ $OS_BUILD == "linux" ]]; then 
-      wget -q -O - "https://api.adoptopenjdk.net/v2/binary/releases/openjdk8?openjdk_impl=hotspot&os=linux&arch=x64&release=latest&type=jdk" | tar xpzf - --strip-components=1 -C ${JDK8_BOOT_DIR}; 
-      bash -c "cd openjdk-build && export LOG=info && ./makejdk-any-platform.sh --branch \"${SOURCE_JDK_BRANCH}\" --tag \"${SOURCE_JDK_TAG}\" --jdk-boot-dir ${JDK8_BOOT_DIR} --build-variant dcevm 
-        --hswap-agent-download-url \"${HSWAP_AGENT_DOWNLOAD_URL}\" --target-file-name java8-openjdk-dcevm-${TRAVIS_OS_NAME}.tar.gz jdk8u"; 
+  - if [[ $OS_BUILD == "linux" ]]; then
+    wget -q -O - "https://api.adoptopenjdk.net/v2/binary/releases/openjdk8?openjdk_impl=hotspot&os=linux&arch=x64&release=latest&type=jdk" | tar xpzf - --strip-components=1 -C ${JDK8_BOOT_DIR};
+    bash -c "cd openjdk-build && export LOG=info && ./makejdk-any-platform.sh --branch \"${SOURCE_JDK_BRANCH}\" --tag \"${SOURCE_JDK_TAG}\" --jdk-boot-dir ${JDK8_BOOT_DIR} --build-variant dcevm
+    --hswap-agent-download-url \"${HSWAP_AGENT_DOWNLOAD_URL}\" --target-file-name java8-openjdk-dcevm-${TRAVIS_OS_NAME}.tar.gz jdk8u";
     fi
-  - if [[ $OS_BUILD == "osx" ]]; then 
-      wget -q -O - "https://api.adoptopenjdk.net/v2/binary/releases/openjdk8?openjdk_impl=hotspot&os=mac&arch=x64&release=latest&type=jdk" | tar xpzf - --strip-components=1 -C ${JDK8_BOOT_DIR}; 
-      JDK8_BOOT_DIR="${JDK8_BOOT_DIR}/Contents/Home";
-      export JDK8_BOOT_DIR="${JDK8_BOOT_DIR}";
-      bash -c "cd openjdk-build && export LOG=info && ./makejdk-any-platform.sh --branch \"${SOURCE_JDK_BRANCH}\" --tag \"${SOURCE_JDK_TAG}\" --jdk-boot-dir ${JDK8_BOOT_DIR} 
-        --build-variant dcevm --hswap-agent-download-url \"${HSWAP_AGENT_DOWNLOAD_URL}\" --target-file-name java8-openjdk-dcevm-${TRAVIS_OS_NAME}.tar.gz --configure-args \"--with-toolchain-type=clang\" --make-args \"COMPILER_WARNINGS_FATAL=false\" jdk8u"; 
+  - if [[ $OS_BUILD == "osx" ]]; then
+    wget -q -O - "https://api.adoptopenjdk.net/v2/binary/releases/openjdk8?openjdk_impl=hotspot&os=mac&arch=x64&release=latest&type=jdk" | tar xpzf - --strip-components=1 -C ${JDK8_BOOT_DIR};
+    JDK8_BOOT_DIR="${JDK8_BOOT_DIR}/Contents/Home";
+    export JDK8_BOOT_DIR="${JDK8_BOOT_DIR}";
+    bash -c "cd openjdk-build && export LOG=info && ./makejdk-any-platform.sh --branch \"${SOURCE_JDK_BRANCH}\" --tag \"${SOURCE_JDK_TAG}\" --jdk-boot-dir ${JDK8_BOOT_DIR}
+    --build-variant dcevm --hswap-agent-download-url \"${HSWAP_AGENT_DOWNLOAD_URL}\" --target-file-name java8-openjdk-dcevm-${TRAVIS_OS_NAME}.tar.gz --configure-args \"--with-toolchain-type=clang\" --make-args \"COMPILER_WARNINGS_FATAL=false\" jdk8u";
     fi
-  - if [[ $OS_BUILD == "windows" ]]; then 
-      powershell -Command "C:\tools\cygwin\bin\bash.exe -c './build_windows.sh'"; 
+  - if [[ $OS_BUILD == "windows" ]]; then
+    powershell -Command "C:\tools\cygwin\bin\bash.exe -c './build_windows.sh'";
     fi
 deploy:
   provider: releases
   api_key:
-    secure: Fd5tpkp2YroqmxM/tHBtiQemmezBW4FKFXYBa4vZzPI4JY1oQGq5XDYhHcajqI1/0FfvZZa51VNqJm13si3EukHRtHv7XSJ2oUB2bHT4X7Ee3VwYdsIw6Ebu+ZIl1Y7uV74ivE+kB2fxZ0bJ/QY+PzNdNxsPZ1Y/KHyr/homTxovfTf/Vf4TPwX8ajHES+zemcFeXGXSx2VP57DVtHyW3OVCCwa+v+oieykGg/9aZp3vOgcl6BuO2dpbrAYIRTtMo39CbXifvyvzwXw/IPc4VZ2jnvNly3VOW7FJBxIZWJAqXzHBRQ81DeJlJ9jX4blXyli1v+DWusNGd/ffDJwPPJilyz9eoIw7O8xeHlR597SGWKQQiF/qOFCzntGyfQ8vNTU1WDXbFCjjImSAxpTvr7q+tzqGMyh31+OaCMahb60FvRMVIEY0S1E7kXDgLQm9eEYBf640K69cp8TVSwNXqaoMV9DG8tSp1uXHU/mMsywuj+D8J5MEeF4SYJ53nM+w1M3YxDBqVclgeir8IgAR2dKAZxpDUmKeJp5bkaNq2LO4LF+YrUIBDuH9s/e0pl3EI9gg7fpw6Hcc9+mf/BURK33o0dTNCMnDmGmyfcH5HPjLuN8qSXqvqe1znxlnLI5odHTd70MauQ6MZjafrEuQ1d64sf7YX9s3CBm25b59ulc=
+    secure: JWgWExF08C6k5CkTRkiZdqwjWRjja2xkWirgs3K31p2qsVky1C5ddMSYnHiYUVhrhFkheg/f8C+tmKaDQqQUmftFb3t1x1U/o9clxKD2j8v/CpZyntqhG5Fs3qab2jbCk/kpO13g5r5P1AOeVl4LMr+KlGq9zDijgxFo45FVBd3FcE3jsV7m5u2ZeKjP0EHddsVKnlLYOvmdvyxi6HR36yLEuaZhSTo8xpTFpZkOctV3zkf1iXmcgW/IA4gAc1RdHBkecbiUrQCL6vaD9paFVdLx8WGLLhCFFpoKk6rifwvlfrYdrtlijXJ1tdPIXgERhJxwC1GkyXJvTb3nwvnuNbOje7pBPkW7dVT/meFhFEK1RFFnR3UXexVsB2MEjsIgbLkR8S4sLLzbfhJljSzV2ZNwXrxOh2ZCwfd2PVNbZd6lPmzIp7rzz3KhJaCflmtaUPXJV2Otch30fqu01jCiY+z+ZewU9xS7bqlF+APM9RaADUSg2I7vLei/I532EqQlODGzomBCXSxUytUty1fLUl9GOI4ELtu52UAweIMtDnPD/Aw2CD4+nIOZelArt0gt7hYbDT7Dq5p76K9mSCRpRMRJtZqQSW58sP+Q/gQT5hvtLAyswgiLyjA0C4cCnrWWzgKT61zU2UJBixMA3QwHxQWRWVZd+rfejlSVs1TfP1o=
   file_glob: true
   file: openjdk-build/workspace/target/*
   skip_cleanup: true
   on:
-    repo: TravaOpenJDK/trava-jdk-8-dcevm
+    repo: NatanNMB15/trava-jdk-8-dcevm
     all_branches: true
     tags: true
